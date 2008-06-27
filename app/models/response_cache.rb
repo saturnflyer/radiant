@@ -7,11 +7,12 @@ class ResponseCache
     :default_extension => '.yml',
     :perform_caching => true,
     :logger => ActionController::Base.logger,
-    :use_x_sendfile => false
+    :use_x_sendfile => false,
+    :sendfile_proc => nil
   }
   cattr_accessor :defaults
   
-  attr_accessor :directory, :expire_time, :default_extension, :perform_caching, :logger, :use_x_sendfile
+  attr_accessor :directory, :expire_time, :default_extension, :perform_caching, :logger, :use_x_sendfile, :sendfile_proc
   alias :page_cache_directory :directory
   alias :page_cache_extension :default_extension
   private :benchmark, :silence, :page_cache_directory,
@@ -26,6 +27,7 @@ class ResponseCache
   # :perform_caching   :: boolean value that turns caching on or off (defaults to true)
   # :logger            :: the application logging object (defaults to ActionController::Base.logger)
   # :use_x_sendfile    :: use X-Sendfile headers to speed up transfer of cached pages (not available on all web servers)
+  # :sendfile_proc     :: a Proc object to use for custom X-Sendfile implementations
   # 
   def initialize(options = {})
     options = options.symbolize_keys.reverse_merge(defaults)
@@ -106,6 +108,8 @@ class ResponseCache
         response.headers.merge!(metadata['headers'] || {})
         if client_has_cache?(metadata, request)
           response.headers.merge!('Status' => '304 Not Modified')
+        elsif sendfile_proc
+          sendfile_proc[request, response, page_cache_directory, file_path]
         elsif use_x_sendfile
           response.headers.merge!('X-Sendfile' => "#{file_path}.data")
         else
