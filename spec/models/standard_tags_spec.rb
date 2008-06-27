@@ -403,6 +403,13 @@ describe "Standard Tags" do
     page.should render("<r:random> <r:option>1</r:option> <r:option>2</r:option> <r:option>3</r:option> </r:random>").matching(/^(1|2|3)$/)
   end
 
+  describe "<r:option>" do
+    it "should render each option before returning" do
+      page(:parent)
+      page.should render('<r:random><r:children:each><r:option><r:title /></r:option></r:children:each></r:random>').matching(/^(Child|Child\ 2|Child\ 3)$/)
+    end
+  end
+
   it '<r:comment> should render nothing it contains' do
     page.should render('just a <r:comment>small </r:comment>test').as('just a test')
   end
