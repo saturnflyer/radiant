@@ -1,4 +1,5 @@
 begin
+  gem 'rdiscount', '>= 1.2.6'
   require 'rdiscount'
   Markdown = RDiscount
   rescue LoadError
