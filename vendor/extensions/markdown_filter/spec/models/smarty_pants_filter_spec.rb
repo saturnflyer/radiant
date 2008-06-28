@@ -1,6 +1,10 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe SmartyPantsFilter do
+  it "depends on the RubyPants library" do
+    'rubypants/rubypants'.should be_loadable
+  end
+
   it "should be named SmartyPants" do
     SmartyPantsFilter.filter_name.should == "SmartyPants"
   end
