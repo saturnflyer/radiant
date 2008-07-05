@@ -7,46 +7,36 @@ describe PagePart do
     @part = @model = PagePart.new(PagePartTestHelper::VALID_PAGE_PART_PARAMS)
   end
   
-  it 'should not save with a name longer than 100 characters' do
+  it 'should err with a name longer than 100 characters' do
     too_long_name = 'x' * 101
     @part.name = too_long_name
-    lambda {
-      @part.save!
-    }.should raise_error(ActiveRecord::RecordInvalid)
+    @part.should have(1).error_on(:name)
   end
   
-  it 'should not save with a filter_id longer than 25 characters' do
+  it 'should err with a filter_id longer than 25 characters' do
     too_long_filter_id = 'x' * 26
     @part.filter_id = too_long_filter_id
-    lambda {
-      @part.save!
-    }.should raise_error(ActiveRecord::RecordInvalid)
+    @part.should have(1).error_on(:filter_id)
   end
   
-  it 'should save with no filter_id' do
+  it 'should not err with no filter_id' do
     @part.filter_id = nil
     lambda{ @part.save! }.should_not raise_error
   end
   
-  it 'should not save without a name' do
+  it 'should err without a name' do
     @part.name = nil
-    lambda {
-      @part.save!
-    }.should raise_error(ActiveRecord::RecordInvalid)
+    lambda {@part.save!}.should raise_error(ActiveRecord::RecordInvalid)
   end
   
-  it 'should not save if page_id is not an integer' do
+  it 'should err if page_id is not an integer' do
     @part.page_id = '1.3'
-    lambda {
-      @part.save!
-    }.should raise_error(ActiveRecord::RecordInvalid)
+    @part.should have(1).error_on(:page_id)
   end
   
-  it 'should not save if id is not an integer' do
+  it 'should err if id is not an integer' do
     @part.id = '1.3'
-    lambda {
-      @part.save!
-    }.should raise_error(ActiveRecord::RecordInvalid)
+    @part.should have(1).error_on(:id)
   end
   
   it 'should save with no page_id' do
