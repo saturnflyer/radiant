@@ -28,27 +28,49 @@ describe Page, 'validations' do
     @page = @model = Page.new(page_params)
   end
   
-  it 'should validate length of' do
-    {
-      :title => 255,
-      :slug => 100,
-      :breadcrumb => 160
-    }.each do |field, max|
-      assert_invalid field, ('%d-character limit' % max), 'x' * (max + 1)
-      assert_valid field, 'x' * max
-    end
+  it 'should not save with a title longer than 255 characters' do
+    too_long_title = 'x' * 256
+    @page.title = too_long_title
+    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid)
   end
   
-  it 'should validate presence of' do
-    [:title, :slug, :breadcrumb].each do |field|
-      assert_invalid field, 'required', '', ' ', nil
-    end 
+  it 'should not save with a slug longer than 100 characters' do
+    too_long_slug = 'x' * 101
+    @page.title = too_long_slug
+    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid)
   end
   
-  it 'should validate format of' do
+  it 'should not save with a breadcrumb longer than 160 characters' do
+    too_long_breadcrumb = 'x' * 161
+    @page.title = too_long_breadcrumb
+    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid)
+  end
+  
+  it 'should not save without a title' do
+    @page.title = nil
+    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid)
+  end
+  
+  it 'should not save without a slug' do
+    @page.slug = nil
+    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid)
+  end
+  
+  it 'should not save without a breadcrumb' do
+    @page.breadcrumb = nil
+    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid)
+  end
+  
+  it 'should not save with a slug containing spaces' do
     @page.parent = pages(:home)
-    assert_valid :slug, 'abc', 'abcd-efg', 'abcd_efg', 'abc.html', '/', '123'
-    assert_invalid :slug, 'invalid format', 'abcd efg', ' abcd', 'abcd/efg'
+    @page.slug = 'invalid slug'
+    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid)
+  end
+  
+  it 'should not save with a slug containing slashes' do
+    @page.parent = pages(:home)
+    @page.slug = 'invalid/slug'
+    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid)
   end
   
   it 'should validate numericality of' do
