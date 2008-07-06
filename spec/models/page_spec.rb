@@ -36,13 +36,13 @@ describe Page, 'validations' do
   
   it 'should err with a slug longer than 100 characters' do
     too_long_slug = 'x' * 101
-    @page.title = too_long_slug
+    @page.slug = too_long_slug
     @page.should have(1).error_on(:slug)
   end
   
   it 'should err with a breadcrumb longer than 160 characters' do
     too_long_breadcrumb = 'x' * 161
-    @page.title = too_long_breadcrumb
+    @page.breadcrumb = too_long_breadcrumb
     @page.should have(1).error_on(:breadcrumb)
   end
   
