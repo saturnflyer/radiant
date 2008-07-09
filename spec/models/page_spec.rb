@@ -213,64 +213,73 @@ describe Page do
   end
   
   it 'should have parts' do
-    @page.parts.count.should == 1
-    pages(:home).parts.count.should == 4
+    @new_page = Page.new(page_params)
+    @new_page.should respond_to(:parts)
   end
   
-  it 'should destroy dependant parts' do
+  it 'should destroy dependant parts when destroyed' do
     @page.parts.create(page_part_params(:name => 'test', :page_id => nil))
-    assert_kind_of PagePart, @page.parts.find_by_name('test')
-    
     id = @page.id
     @page.destroy
-    assert_nil PagePart.find_by_page_id_and_name(id, 'test')
+    PagePart.find_by_page_id(id).should be_nil
   end
   
-  it 'should allow access to parts by name with a string' do
+  it 'should allow access to a part by name with a string' do
     part = @page.part('body')
     part.name.should == 'body'
   end
   
-  it 'should allow access to parts by name with a symbol' do
+  it 'should allow access to a part by name with a symbol' do
     part = @page.part(:body)
     part.name.should == 'body'
   end
   
-  it 'should allow access to parts by name when page is unsaved' do
+  it 'should allow access to a part by name with a string when the page is unsaved' do
     part = PagePart.new(:content => "test", :name => "test")
     @page.parts << part
     @page.part('test').should == part
+  end
+  
+  it 'should allow access to a part by name with a symbol when the page is unsaved' do
+    part = PagePart.new(:content => "test", :name => "test")
+    @page.parts << part
     @page.part(:test).should == part
   end
   
-  it 'should allow access to parts by name created with the build method when page is unsaved' do
+  it 'should allow access to parts by name with a string when created with the build method and the page is unsaved' do
     @page.parts.build(:content => "test", :name => "test")
     @page.part('test').content.should == "test"
+  end
+  
+  it 'should allow access to parts by name with a symbol when created with the build method and the page is unsaved' do
+    @page.parts.build(:content => "test", :name => "test")
     @page.part(:test).content.should == "test"
   end
   
   it 'should set published_at when published' do
     @page = Page.new(page_params(:status_id => '1', :published_at => nil))
-    assert_nil @page.published_at
     
     @page.status_id = Status[:published].id
     @page.save
-    assert_not_nil @page.published_at
-    @page.published_at.day.should == Time.now.day
+    @page.published_at.strftime("%Y %m %d %H %M").should == Time.now.strftime("%Y %m %d %H %M")
+    # if you find an error here, run your specs again. Time sensitive comparisons that occor at the change of a minute may fail
   end 
   
   it 'should not update published_at when already published' do
     @page = Page.new(page_params(:status_id => Status[:published].id))
-    @page.published_at.should be_kind_of(Time) 
     
     expected = @page.published_at
     @page.save
     @page.published_at.should == expected
   end
   
+  it 'should have a Time object for published_at' do
+    @page.published_at.should be_kind_of(Time) 
+  end
+  
   it 'should answer true when published' do
     @page.status = Status[:published]
-    @page.published?.should == true
+    @page.published?.should be_true
   end
   
   it 'should answer false when not published' do
@@ -278,35 +287,47 @@ describe Page do
     @page.published?.should be_false
   end
   
-  it "should answer the page's url" do
+  it "should return a slash delimited string of slugs from the page and it's ancestors when requesting the page's url" do
     @page = pages(:parent)
-    @page.url.should == '/parent/'
     @page.children.first.url.should == '/parent/child/'
-    
-    grandchild = pages(:grandchild)
-    grandchild.url.should == '/parent/child/grandchild/'
   end
   
-  it 'should allow you to calculate a child url from the parent' do
+  it "should allow you to calculate it's child's url" do
     @page = pages(:parent)
-    child = pages(:child)
-    @page.child_url(child).should == '/parent/child/'
+    @page.child_url(@page.children.first).should == '/parent/child/'
   end
   
   it 'should return the appropriate status code in headers' do
     @page.headers.should == { 'Status' => ActionController::Base::DEFAULT_RENDER_STATUS_CODE }
   end
   
-  it 'should have status' do
+  it 'should have status_id of 1 when draft' do
     @page = pages(:home)
-    @page.status.should == Status[:published]
+    @page.status = Status[:draft]
+    @page.status_id.should == 1
+  end
+  
+  it 'should have status_id of 50 when reviewed' do
+    @page = pages(:home)
+    @page.status = Status[:reviewed]
+    @page.status_id.should == 50
+  end
+  
+  it 'should have status_id of 100 when published' do
+    @page = pages(:home)
+    @page.status_id.should == 100
+  end
+  
+  it 'should have status_id of 101 when hidden' do
+    @page = pages(:home)
+    @page.status = Status[:hidden]
+    @page.status_id.should == 101
   end
   
   it 'should allow you to set the status' do
     @page = pages(:home)
     draft = Status[:draft]
     @page.status = draft
-    @page.status.should == draft
     @page.status_id.should == draft.id
   end
   
@@ -318,32 +339,43 @@ describe Page do
     @page.virtual?.should == false
   end
   
-  it 'should allow you to tell if a part exists based on a string or symbol' do
+  it 'should state that it has a part based on a string' do
     @page = pages(:home)
-    @page.has_part?(:body).should == true
-    @page.has_part?('sidebar').should == true
-    @page.has_part?(:obviously_false_part_name).should == false
+    @page.has_part?('sidebar').should be_true
   end
   
-  it 'should allow you to tell if a part is inherited' do
-    @page = pages(:child)
-    @page.has_part?(:sidebar).should == false
-    @page.inherits_part?(:sidebar).should == true
-    
+  it 'should state that it has a part based on a symbol' do
     @page = pages(:home)
-    @page.has_part?(:sidebar).should == true
-    @page.inherits_part?(:sidebar).should == false
+    @page.has_part?(:body).should be_true
   end
   
-  it 'should allow you to tell if a part exists or is inherited' do
-    @page = pages(:child)
-    @page.has_part?(:sidebar).should == false
-    @page.has_or_inherits_part?(:sidebar).should == true
-    @page.has_or_inherits_part?(:obviously_false_part_name).should == false
-    
+  it 'should state that it does not have a part based on a string' do
     @page = pages(:home)
-    @page.has_part?(:sidebar).should == true
+    @page.has_part?('imaginary').should_not be_true
+  end
+  
+  it 'should state that it does not have a part based on a symbol' do
+    @page = pages(:home)
+    @page.has_part?(:madeup).should_not be_true
+  end
+  
+  it 'should state that it inherits an existing part from the parent when it does not have the specified part' do
+    @page = pages(:child)
+    @page.inherits_part?(:sidebar).should be_true
+  end
+  
+  it 'should state that it does not inherit a part from the parent when it has the specified part' do
+    @page = pages(:home)
+    @page.inherits_part?(:sidebar).should_not be_true
+  end
+  
+  it 'should state that it has or inherits an existing part' do
+    @page = pages(:child)
     @page.has_or_inherits_part?(:sidebar).should == true
+  end
+  
+  it 'should state that it does not have or inherit a non-existant part' do
+    @page = pages(:child)
     @page.has_or_inherits_part?(:obviously_false_part_name).should == false
   end
   
