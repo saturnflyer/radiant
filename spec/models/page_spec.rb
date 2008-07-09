@@ -28,73 +28,86 @@ describe Page, 'validations' do
     @page = @model = Page.new(page_params)
   end
   
-  it 'should err with a title longer than 255 characters' do
+  it 'should err with "255-character limit" when given a title longer than 255 characters' do
     too_long_title = 'x' * 256
     @page.title = too_long_title
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /Title 255-character limit/)
+    @page.valid?
+    @page.errors.on(:title).should include('255-character limit')
   end
   
-  it 'should err with a slug longer than 100 characters' do
+  it 'should err with "100-character limit" when given a slug longer than 100 characters' do
     too_long_slug = 'x' * 101
-    @page.title = too_long_slug
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /Slug 100-character limit/)
+    @page.slug = too_long_slug
+    @page.valid?
+    @page.errors.on(:slug).should include('100-character limit')
   end
   
-  it 'should err with a breadcrumb longer than 160 characters' do
+  it 'should err with "160-character limit" when given a breadcrumb longer than 160 characters' do
     too_long_breadcrumb = 'x' * 161
-    @page.title = too_long_breadcrumb
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /Breadcrumb 160-character limit/)
+    @page.breadcrumb = too_long_breadcrumb
+    @page.valid?
+    @page.errors.on(:breadcrumb).should include('160-character limit')
   end
   
-  it 'should not save and say that title is required when saving without a title' do
+  it 'should err that title is "required" when given no title' do
     @page.title = nil
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /required/)
+    @page.valid?
+    @page.errors.on(:title).should include('required')
   end
   
-  it 'should not save and say that slug is required when saving without a slug' do
+  it 'should err that slug is "required" when given no slug' do
     @page.slug = nil
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /required/)
+    @page.valid?
+    @page.errors.on(:slug).should include('required')
   end
   
-  it 'should not save and say that breadcrumb is required when saving without a breadcrumb' do
+  it 'should err that breadcrumb is "required" when given no breadcrumb' do
     @page.breadcrumb = nil
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /required/)
+    @page.valid?
+    @page.errors.on(:breadcrumb).should include('required')
   end
   
-  it 'should not save and say that status_id is required when saving without a status_id' do
+  it 'should err that status_id is "required" when given no status_id' do
     @page.status_id = nil
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /required/)
+    @page.valid?
+    @page.errors.on(:status_id).should include('required')
   end
   
-  it 'should err with a slug containing one or more spaces' do
+  it 'should err with "invalid format" with a slug containing one or more spaces' do
     @page.slug = 'invalid slug'
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /invalid format/)
+    @page.valid?
+    @page.errors.on(:slug).should include('invalid format')
   end
   
-  it 'should err with a slug containing one or more slashes' do
+  it 'should err with "invalid format" with a slug containing one or more slashes' do
     @page.slug = 'invalid/slug'
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /invalid format/)
+    @page.valid?
+    @page.errors.on(:slug).should include('invalid format')
   end
   
-  it 'should report that id "must be a number" when saving with a non integer id' do
+  it 'should err that id "must be a number" when given a non integer id' do
     @page.id = 'a'
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /must be a number/)
+    @page.valid?
+    @page.errors.on(:id).should include('must be a number')
   end
   
-  it 'should report that status_id "must be a number" when saving with a non integer status_id' do
+  it 'should err that status_id "must be a number" when given a non integer status_id' do
     @page.status_id = '2,4'
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /must be a number/)
+    @page.valid?
+    @page.errors.on(:status_id).should include('must be a number')
   end
   
-  it 'should report that parent_id "must be a number" when saving with a non integer parent_id' do
+  it 'should err that parent_id "must be a number" when given a non integer parent_id' do
     @page.parent_id = '1.3'
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /must be a number/)
+    @page.valid?
+    @page.errors.on(:parent_id).should include('must be a number')
   end
   
-  it 'should report "slug already in use for child of parent" when saving given a slug already in use by a child of the same parent page' do
+  it 'should err that "slug already in use for child of parent" when given a slug already in use by a child of the same parent page' do
     @page.parent = pages(:parent)
     @page.slug = 'child'
-    lambda { @page.save! }.should raise_error(ActiveRecord::RecordInvalid, /slug already in use for child of parent/)
+    @page.valid?
+    @page.errors.on(:slug).should include('slug already in use for child of parent')
   end
   
   it 'should allow a duplicate slug when pages do not have the same parent' do
@@ -105,24 +118,21 @@ describe Page, 'validations' do
     @page.should be_valid
   end
   
-  it 'should allow mass assignment for class name' do
+  it 'should allow assignment of class name' do
     @page.attributes = { :class_name => 'ArchivePage' }
-    assert_valid @page
-    @page.class_name.should == 'ArchivePage'
+    @page.should be_valid
   end
   
-  it 'should not be valid when class name is not a descendant of page' do
+  it 'should err with "must be set to a valid descendant of Page" when the given class name is not a descendant of page' do
     @page.class_name = 'Object'
-    @page.should_not be_valid
-    assert_not_nil @page.errors.on(:class_name)
-    @page.errors.on(:class_name).should == 'must be set to a valid descendant of Page'
+    @page.valid?
+    @page.errors.on(:class_name).should include('must be set to a valid descendant of Page')
   end
 
-  it 'should not be valid when class name is not a descendant of page and it is set through mass assignment' do
+  it 'should err with "must be set to a valid descendant of Page" when the given class name is not a descendant of page and it is set through mass assignment' do
     @page.attributes = {:class_name => 'Object' }
-    @page.valid?.should == false
-    assert_not_nil @page.errors.on(:class_name)
-    @page.errors.on(:class_name).should == 'must be set to a valid descendant of Page'
+    @page.valid?
+    @page.errors.on(:class_name).should include('must be set to a valid descendant of Page')
   end
     
   it 'should save successfully with a class name of "Page"' do
@@ -177,16 +187,21 @@ end
 describe Page, "layout" do
   scenario :pages_with_layouts
   
-  it 'should be accessible' do
-    @page = pages(:first)
-    @page.layout_id.should == layout_id(:main)
-    @page.layout.name.should == "Main"
-  end
-  
-  it 'should be inherited' do
-    @page = pages(:inherited_layout)
-    @page.layout_id.should == nil
-    @page.layout.should == @page.parent.layout
+  describe "with no layout assigned" do
+    it "should return the name of the layout for its ancestor when requesting its layout name" do
+      @page = pages(:first)
+      @page.layout.name.should == "Main"
+    end
+    
+    it "should return the layout_id of the layout for its ancestor when requesting its layout_id" do
+      @page = pages(:first)
+      @page.layout_id.should == layout_id(:main)
+    end
+    
+    it "should have the layout of its ancestor" do
+      @page = pages(:inherited_layout)
+      @page.layout.should == @page.parent.layout
+    end
   end
 end
 
