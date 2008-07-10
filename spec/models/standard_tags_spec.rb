@@ -400,7 +400,9 @@ describe "Standard Tags" do
   end
 
   it '<r:random> should render a randomly selected contained <r:option>' do
+    page(:parent)
     page.should render("<r:random> <r:option>1</r:option> <r:option>2</r:option> <r:option>3</r:option> </r:random>").matching(/^(1|2|3)$/)
+    page.should render('<r:random><r:children:each><r:option><r:title /></r:option></r:children:each></r:random>').matching(/^(Child|Child\ 2|Child\ 3)$/)
   end
 
   it '<r:comment> should render nothing it contains' do
