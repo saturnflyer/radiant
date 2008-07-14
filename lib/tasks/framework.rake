@@ -28,39 +28,34 @@ unless File.directory? "#{RAILS_ROOT}/app"
         end
       end
 
-      desc "Lock to latest Edge Radiant or a specific revision with REVISION=X (ex: REVISION=4021), a tag with TAG=Y (ex: TAG=rel_1-1-0), or a branch with BRANCH=Z (ex: BRANCH=mental)"
+      desc "Lock to latest Edge Radiant or a specific revision with REVISION=X (ex: REVISION=245484e), a tag with TAG=Y (ex: TAG=0.6.6), or a branch with BRANCH=Z (ex: BRANCH=mental)"
       task :edge do
         $verbose = false
-        `svn --version` rescue nil
+        `git --version` rescue nil
         unless !$?.nil? && $?.success?
-          $stderr.puts "ERROR: Must have subversion (svn) available in the PATH to lock this application to Edge Radiant"
+          $stderr.puts "ERROR: Must have git available in the PATH to lock this application to Edge Radiant"
           exit 1
         end
 
         rm_rf   "vendor/radiant"
-        mkdir_p "vendor/radiant"
 
-        svn_root = "http://svn.radiantcms.org/radiant/"
+        radiant_git = "git://github.com/radiant/radiant.git"
 
         case
         when ENV['TAG']
-          radiant_svn = "#{svn_root}/tags/#{ENV['TAG']}"
-          touch "vendor/radiant/TAG_#{ENV['TAG']}"
+          system "git clone #{radiant_git} vendor/radiant"
+          system "cd vendor/radiant; git checkout -b #{ENV['TAG']}"
         when ENV['BRANCH']
-          radiant_svn = "#{svn_root}/branches/#{ENV['BRANCH']}"
-          touch "vendor/radiant/BRANCH_#{ENV['BRANCH']}"
+          system "git clone #{radiant_git} vendor/radiant"
+          system "cd vendor/radiant; git checkout --track -b #{ENV['BRANCH']} origin/#{ENV['BRANCH']}"
+        when ENV['REVISION']
+          system "git clone #{radiant_git} vendor/radiant"
+          system "cd vendor/radiant; git checkout -b REV_#{ENV['REVISION']} #{ENV['REVISION']}"
+
         else
-          radiant_svn = "#{svn_root}/trunk"
+          system "git clone #{radiant_git} vendor/radiant"
 
-          if ENV['REVISION'].nil?
-            ENV['REVISION'] = /^r(\d+)/.match(%x{svn -qr HEAD log #{svn_root}})[1]
-            puts "REVISION not set. Using HEAD, which is revision #{ENV['REVISION']}."
-          end
-
-          touch "vendor/radiant/REVISION_#{ENV['REVISION']}"
         end
-      
-        system "svn export #{radiant_svn}/radiant vendor/radiant" + (ENV['REVISION'] ? " -r #{ENV['REVISION']}" : "") + " --force"
       end
     end
 
@@ -97,10 +92,10 @@ unless File.directory? "#{RAILS_ROOT}/app"
       task :javascripts do
         FileUtils.mkdir_p("#{RAILS_ROOT}/public/javascripts/admin/")
         copy_javascripts = proc do |project_dir, scripts|
-          scripts.reject!{|s| File.basename(s) == 'application.js'} if File.exists?(project_dir + 'application.js') 
-          FileUtils.cp(scripts, project_dir) 
+          scripts.reject!{|s| File.basename(s) == 'application.js'} if File.exists?(project_dir + 'application.js')
+          FileUtils.cp(scripts, project_dir)
         end
-        copy_javascripts[RAILS_ROOT + '/public/javascripts/', Dir["#{File.dirname(__FILE__)}/../../public/javascripts/*.js"]] 
+        copy_javascripts[RAILS_ROOT + '/public/javascripts/', Dir["#{File.dirname(__FILE__)}/../../public/javascripts/*.js"]]
         copy_javascripts[RAILS_ROOT + '/public/javascripts/admin/', Dir["#{File.dirname(__FILE__)}/../../public/javascripts/admin/*.js"]]
       end
 
@@ -114,7 +109,7 @@ unless File.directory? "#{RAILS_ROOT}/app"
           FileUtils.cp(instance_env, backup_env)
           FileUtils.cp(gen_env, instance_env)
           puts "** WARNING **
-config/environment.rb has changed in Radiant 0.6.5. Your original has been
+config/environment.rb was changed in Radiant 0.6.5. Your original has been
 backed up to config/environment.bak and replaced with the packaged version.
 Please copy your customizations to the new file."
         end
