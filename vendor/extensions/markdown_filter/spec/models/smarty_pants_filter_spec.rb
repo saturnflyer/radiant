@@ -17,8 +17,12 @@ describe SmartyPantsFilter do
     SmartyPantsFilter.filter("\`\`double quote\'\'").should == "&#8220;double quote&#8221;"
   end
 
-  it "should transform plain dashes into fancy dashes" do
-    SmartyPantsFilter.filter("an en -- dash followed by an em --- dash").should == "an en &#8211; dash followed by an em &#8212; dash"
+  it "should transform double dashes into en dashes" do
+    SmartyPantsFilter.filter("an en -- dash").should == "an en &#8211; dash"
+  end
+
+  it "should transform triple dashes into em dashes" do
+    SmartyPantsFilter.filter("an em --- dash").should == "an em &#8212; dash"
   end
 
   it "should transform three dots into ellipsis" do
