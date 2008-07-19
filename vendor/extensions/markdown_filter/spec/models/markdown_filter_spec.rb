@@ -10,6 +10,6 @@ describe MarkdownFilter do
   end
   
   it "should filter text according to Markdown rules" do
-    MarkdownFilter.filter('**strong**').should == /\<p\>\<strong\>strong\<\/strong\>\<\/p\>[\n]/
+    MarkdownFilter.filter('**strong**').should == "<p><strong>strong</strong></p>"
   end
 end
