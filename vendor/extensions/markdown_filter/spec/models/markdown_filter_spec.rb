@@ -1,8 +1,8 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe MarkdownFilter do
-  it "depends on a Markdown processing library" do
-    either_of(:rdiscount, :bluecloth).should be_loadable
+  it "depends on the BlueCloth Markdown library" do
+    'bluecloth'.should be_loadable
   end
 
   it "should be named Markdown" do
