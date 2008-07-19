@@ -10,7 +10,7 @@ describe MarkdownFilter do
   end
   
   it "should filter text according to Markdown rules" do
-    MarkdownFilter.filter('**strong**').should == '<p><strong>strong</strong></p>'
+    MarkdownFilter.filter('**strong**').should == /\<p\>\<strong\>strong\<\/strong\>\<\/p\>[\n]/
   end
   
   it "should filter text with quotes into smart quotes" do

@@ -126,7 +126,6 @@ describe "Standard Tags" do
     end
   end
 
-
   describe "<r:children:each:header>" do
     it "should render the header when it changes" do
       tags = '<r:children:each><r:header>[<r:date format="%b/%y" />] </r:header><r:slug /> </r:children:each>'
@@ -387,7 +386,7 @@ describe "Standard Tags" do
     end
 
     it "should filter the snippet with its assigned filter" do
-      page.should render('<r:page><r:snippet name="markdown" /></r:page>').as('<p><strong>markdown</strong></p>')
+      page.should render('<r:page><r:snippet name="markdown" /></r:page>').as(/\<p\>\<strong\>markdown\<\/strong\>\<\/p\>[\n]/)
     end
 
     it "should maintain the global page inside the snippet" do
