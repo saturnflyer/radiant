@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe PagePart do
+  scenario :pages
   test_helper :page_parts, :validations
   
   before :each do
@@ -49,20 +50,31 @@ describe PagePart do
     lambda {@part.save!}.should_not raise_error
   end
 
-  it 'should find parts ordered by name'
+  it 'should find parts ordered by name' do
+    pending "order_by seems to not be working..."
+    @page = pages(:home)
+    @page.parts.should == [@page.part('body'),@page.part('extended'),@page.part('sidebar'),@page.part('titles')]
+  end
 end
 
 describe PagePart, 'filter' do
   scenario :markup_pages
   
-  specify 'getting and setting' do
+  before(:each) do
     @part = page_parts(:textile_body)
-    original = @part.filter
-    original.should be_kind_of(TextileFilter)
-    
-    @part.filter.should equal(original)
-    
+  end
+  
+  it 'should have a TextileFilter with a filter_id of "Textile"' do
+    @part.filter.should be_kind_of(TextileFilter)
+  end
+  
+  it 'should have a MarkdownFilter with a filter_id of "Markdown"' do
     @part.filter_id = 'Markdown'
     @part.filter.should be_kind_of(MarkdownFilter)
+  end
+  
+  it 'should have a SmartyPantsFilter with a filter_id of "SmartyPants"' do
+    @part.filter_id = 'SmartyPants'
+    @part.filter.should be_kind_of(SmartyPantsFilter)
   end
 end
