@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe MarkdownFilter do
-  it "depends on the Markdown and SmartyPants processing libraries" do
+  it "depends on the BlueCloth and SmartyPants processing libraries" do
     all_of('rubypants/rubypants', :bluecloth).should be_loadable
   end
 
