@@ -478,6 +478,7 @@ describe "Standard Tags" do
   end
 
   it '<r:random> should render a randomly selected, dynamically set <r:option>' do
+    pending "<r:random> should allow dynamically set <r:option>"
     page.should render("<r:random><r:children:each><r:option><r:title /></r:option></r:children:each></r:random>").matching(/^(Child|Child\ 2|Child\ 3)$/)
   end
 
