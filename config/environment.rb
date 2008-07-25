@@ -83,11 +83,5 @@ Radiant::Initializer.run do |config|
     # Response Caching Defaults
     ResponseCache.defaults[:directory] = ActionController::Base.page_cache_directory
     ResponseCache.defaults[:logger]    = ActionController::Base.logger
-    
-    # Response Caching for Custom Sendfile implementations
-    ResponseCache.defaults[:sendfile_proc] = lambda { |request, response, cache_dir, file|
-      filename = file.slice(File.expand_path(cache_dir).length, file.length)
-      response.headers.merge!('X-Accel-Redirect' => "/cache#{filename}.data")
-    }
   end
 end
