@@ -34,7 +34,6 @@ class ResponseCache
     self.default_extension = options[:default_extension]
     self.perform_caching   = options[:perform_caching]
     self.logger            = options[:logger]
-    self.use_x_sendfile    = options[:use_x_sendfile]
   end
   
   # Caches a response object for path to disk.
