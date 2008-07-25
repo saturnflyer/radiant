@@ -13,11 +13,11 @@ describe MarkdownFilter do
     MarkdownFilter.filter('Just a paragraph.').should == '<p>Just a paragraph.</p>'
   end
 
-  it "should transform double astericks or underscores into <strong> tags" do
+  it "should transform double asterisks or underscores into <strong> tags" do
     MarkdownFilter.filter('**strong** __strong__').should == '<p><strong>strong</strong> <strong>strong</strong></p>'
   end
 
-  it "should transform single asktericks or underscores into <em> tags" do
+  it "should transform single asterisks or underscores into <em> tags" do
     MarkdownFilter.filter('*emphasis* _emphasis_').should == '<p><em>emphasis</em> <em>emphasis</em></p>'
   end
 
