@@ -389,6 +389,18 @@ module StandardTags
   end
   
   desc %{
+    Renders the contained elements unless the current contextual page is either the actual page or one of its parents.
+    
+    This is typically used inside another tag (like &lt;r:children:each&gt;) to add conditional mark-up unless the child element is or descends from the current page.
+    
+    *Usage:*
+    <pre><code><r:unless_ancestor_or_self>...</unless_ancestor_or_self></code></pre>
+  }  
+  tag "unless_ancestor_or_self" do |tag|
+    tag.expand unless (tag.globals.page.ancestors + [tag.globals.page]).include?(tag.locals.page)
+  end
+  
+  desc %{
     Renders the contained elements if the current contextual page is also the actual page.
     
     This is typically used inside another tag (like &lt;r:children:each&gt;) to add conditional mark-up if the child element is the current page.
@@ -398,6 +410,18 @@ module StandardTags
   }
   tag "if_self" do |tag|
     tag.expand if tag.locals.page == tag.globals.page
+  end
+  
+  desc %{
+    Renders the contained elements unless the current contextual page is also the actual page.
+    
+    This is typically used inside another tag (like &lt;r:children:each&gt;) to add conditional mark-up unless the child element is the current page.
+    
+    *Usage:*
+    <pre><code><r:unless_self>...</unless_self></code></pre>
+  }
+  tag "unless_self" do |tag|
+    tag.expand unless tag.locals.page == tag.globals.page
   end
   
   desc %{
@@ -492,10 +516,17 @@ module StandardTags
     
     *Usage:*
     <pre><code><r:snippet name="snippet_name" /></code></pre>
+    
+    When used as a double tag, the part in between both tags may be used within the
+    snippet itself, being substituted in place of @<r:yield/>@. 
+    
+    *Usage:*
+    <pre><code><r:snippet name="snippet_name">Lorem ipsum dolor...</r:snippet></code></pre>
   }
   tag 'snippet' do |tag|
     if name = tag.attr['name']
       if snippet = Snippet.find_by_name(name.strip)
+        tag.locals.yield = tag.expand if tag.double?
         tag.globals.page.render_snippet(snippet)
       else
         raise TagError.new('snippet not found')
@@ -504,7 +535,41 @@ module StandardTags
       raise TagError.new("`snippet' tag must contain `name' attribute")
     end
   end
-
+  
+  desc %{ 
+    Used within a snippet as a placeholder for substitution of child content, when 
+    the snippet is called as a double tag.
+    
+    *Usage (within a snippet):*
+    <pre><code>
+    <div id="outer">
+      <p>before</p>
+      <r:yield/>
+      <p>after</p>
+    </div>
+    </code></pre>
+    
+    If the above snippet was named "yielding", you could call it from any Page, 
+    Layout or Snippet as follows:
+    
+    <pre><code><r:snippet name="yielding">Content within</r:snippet></code></pre>
+    
+    Which would output the following:
+    
+    <pre><code>
+    <div id="outer">
+      <p>before</p>
+      Content within
+      <p>after</p>
+    </div>
+    </code></pre>
+    
+    When called in the context of a Page or a Layout, @<r:yield/>@ outputs nothing.
+  }
+  tag 'yield' do |tag|
+    tag.locals.yield
+  end
+  
   desc %{
     Inside this tag all page related tags refer to the page found at the @url@ attribute.  
     @url@s may be relative or absolute paths.
