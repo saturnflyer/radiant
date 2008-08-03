@@ -1,0 +1,18 @@
+= <%= extension_name %>
+
+The <%= extension_name %> extension is great! Install it in your 
+Radiant instance in vendor/extensions. Once you've done that you 
+can run these commands:
+
+rake radiant:extensions:<%= file_name %>:install
+
+That task will run these tasks together:
+
+rake radiant:extensions:<%= file_name %>:migrate
+rake radiant:extensions:<%= file_name %>:update
+
+Be sure to specify the appropriate environment, such as
+
+rake production radiant:extensions:<%= file_name %>:install
+
+Now you're on you way to enjoying <%= extension_name %>!

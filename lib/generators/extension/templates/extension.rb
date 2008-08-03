@@ -3,7 +3,7 @@
 
 class <%= class_name %> < Radiant::Extension
   version "1.0"
-  description "Describe your extension here"
+  description "Provides a way to manage <%= extension_name %>"
   url "http://yourwebsite.com/<%= file_name %>"
   
   # define_routes do |map|
