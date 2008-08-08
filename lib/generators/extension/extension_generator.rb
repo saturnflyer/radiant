@@ -41,11 +41,7 @@ class ExtensionGenerator < Rails::Generator::NamedBase
         m.file     'spec.opts',           "#{extension_path}/spec/spec.opts"
       end
       
-      if options[:no_license]
-        puts "WTF"
-      else
-        puts options[:no_license]
-        puts options[:with_test_unit]
+      unless options[:no_license]
         m.template 'LICENSE',             "#{extension_path}/LICENSE"
       end
     end
