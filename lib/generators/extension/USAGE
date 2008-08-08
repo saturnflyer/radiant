@@ -18,7 +18,7 @@ Example:
     vendor/extensions/asset_management/app/views
     vendor/extensions/asset_management/db/migrate
     vendor/extensions/asset_management/lib/tasks
-    vendor/extensions/asset_management/README
+    vendor/extensions/asset_management/README.rdoc
     vendor/extensions/asset_management/asset_management_extension.rb
     vendor/extensions/asset_management/lib/tasks/asset_management_extension_tasks.rake
     vendor/extensions/asset_management/spec/controllers
@@ -28,3 +28,4 @@ Example:
     vendor/extensions/asset_management/Rakefile
     vendor/extensions/asset_management/spec/spec_helper.rb
     vendor/extensions/asset_management/spec/spec.opts
+    vendor/extensions/asset_management/LICENSE

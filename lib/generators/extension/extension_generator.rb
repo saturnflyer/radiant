@@ -40,6 +40,14 @@ class ExtensionGenerator < Rails::Generator::NamedBase
         m.template 'spec_helper.rb',      "#{extension_path}/spec/spec_helper.rb"
         m.file     'spec.opts',           "#{extension_path}/spec/spec.opts"
       end
+      
+      if options[:no_license]
+        puts "WTF"
+      else
+        puts options[:no_license]
+        puts options[:with_test_unit]
+        m.template 'LICENSE',             "#{extension_path}/LICENSE"
+      end
     end
   end
   
@@ -56,5 +64,7 @@ class ExtensionGenerator < Rails::Generator::NamedBase
     opt.separator 'Options:'
     opt.on("--with-test-unit", 
            "Use Test::Unit for this extension instead of RSpec") { |v| options[:with_test_unit] = v }
+    opt.on("-l, --no-license", 
+           "Generate this extension without the default MIT license file") { |l| options[:no_license] = l }
   end
 end
