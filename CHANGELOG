@@ -1,6 +1,8 @@
 == Change Log
 
 === Edge
+* Added more information to extension generator with default MIT license, and
+new extension_name:install task [Jim Gay]
 * Fixed the radiant:update:scripts to find the proper directory [Jim Gay]
 * Factor out dev? functionality in StandardTags, allowing other tags to access
 it. [Sean Cribbs]
