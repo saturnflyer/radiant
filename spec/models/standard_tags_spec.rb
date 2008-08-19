@@ -384,6 +384,45 @@ describe "Standard Tags" do
     it "should render nothing when the page has no author" do
       page(:no_user).should render('<r:author />').as('')
     end
+    
+  end
+  
+  describe "<r:authors>" do
+    it "should render it's contents"
+    it "should collect a group of authors"
+    it "should allow a login attribute to limit the group of authors to the given login"
+    it "should allow a comma delimited list of logins to limit the group of authors"
+  end
+  
+  describe "<r:authors:each>" do
+    it "should render it's contents for each author"
+  end
+  
+  [:name, :email].each do |attr|
+    describe "<r:authors:each:#{attr}>" do
+      it "should render the '#{attr}' attribute of the current author" do
+        pending "not implemented"
+        value = author.send(attr)
+        page.should render("<r:authors:each:#{attr} />").as(value.to_s)
+      end
+    end
+  end
+  
+  describe "<r:authors:each:pages>" do
+    it "should render the contents"
+    it "should order the author's pages by the given order attribute"
+    it "should limit the author's pages to 10"
+    it "should limit the author's pages to the given limit attribute"
+    it "should find the author's pages as children of the page in the given scope attribute"
+  end
+  
+  describe "<r:authors:each:pages:each>" do
+    it "should render it's contents for each of the current author's pages."
+    it "should set the scope for the current page"
+  end
+
+  describe "<r:authors:pages:count>" do
+    it "should render the number of pages for the current author"
   end
 
   describe "<r:date>" do
