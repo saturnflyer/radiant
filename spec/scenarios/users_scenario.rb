@@ -19,7 +19,8 @@ class UsersScenario < Scenario::Base
         :name => name,
         :email => "#{symbol}@example.com", 
         :login => symbol.to_s,
-        :password => "password"
+        :password => "password",
+        :notes => "#{symbol} note"
       }.merge(attributes)
       attributes[:password_confirmation] = attributes[:password]
       attributes

@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
   # Associations
   belongs_to :created_by, :class_name => 'User'
   belongs_to :updated_by, :class_name => 'User'
+  has_many :pages, :foreign_key => :created_by_id
   
   # Validations
   validates_uniqueness_of :login, :message => 'login already in use'

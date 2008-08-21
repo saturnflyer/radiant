@@ -1,6 +1,9 @@
 == Change Log
 
 === Edge
+* Made <r:author> both a single and double tag with more visible attributes [Jim Gay]
+* Added <r:pages> and associated tags to list pages by the current author [Jim Gay]
+* Added <r:authors> and associated tags to list details about site authors [Jim Gay]
 * Make script/extension more friendly, adding help and info commands. [Sean Cribbs]
 * Added more render regions to layout, snippet, user, and extension views. [Sean Cribbs]
 * Fixed the radiant:update:scripts to find the proper directory [Jim Gay]
