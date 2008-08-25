@@ -444,7 +444,7 @@ module StandardTags
     end
   end
   
-  [:name, :email, :notes].each do |att|
+  [:name, :email].each do |att|
     desc %{
       Renders the #{att} of the current author
     }

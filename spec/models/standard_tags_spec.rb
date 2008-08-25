@@ -402,12 +402,6 @@ describe "Standard Tags" do
     end
   end
   
-  describe "<r:author:notes>" do
-    it "should render the notes of the current author" do
-      page.should render('<r:author:notes />').as('admin note')
-    end
-  end
-  
   describe "<r:authors>" do
     it "should render it's contents" do
       page.should render('<r:authors>Authors</r:authors>').as('Authors')
