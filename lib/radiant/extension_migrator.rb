@@ -38,11 +38,15 @@ module Radiant
     end
     
     def migrated
-      @extension.meta.schema_version.to_i > 0 ? (1..@extension.meta.schema_version) : []
+      ActiveRecord::Base.connection.select_values("SELECT version FROM extension_migrations WHERE extension_id = #{@extension.meta.id}").map(&:to_i).sort
     end
   
     def record_version_state_after_migrating(version)
-      @extension.meta.update_attributes(:schema_version => (down? ? version.to_i - 1 : version.to_i))
+      if down?
+        ActiveRecord::Base.connection.update("DELETE FROM extension_migrations WHERE version = '#{version}' AND extension_id = #{@extension.meta.id}")
+      else
+        ActiveRecord::Base.connection.insert("INSERT INTO extension_migrations (version, extension_id) VALUES ('#{version}', #{@extension.meta.id})")
+      end
     end
   
   end

@@ -1,5 +1,5 @@
 # This file is auto-generated from the current state of the database. Instead of editing this file, 
-# please use the migrations feature of ActiveRecord to incrementally modify your database, and
+# please use the migrations feature of Active Record to incrementally modify your database, and
 # then regenerate this schema definition.
 #
 # Note that this schema.rb definition is the authoritative source for your database schema. If you need
@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 21) do
+ActiveRecord::Schema.define(:version => 22) do
 
   create_table "config", :force => true do |t|
     t.string "key",   :limit => 40, :default => "", :null => false
@@ -20,26 +20,32 @@ ActiveRecord::Schema.define(:version => 21) do
 
   create_table "extension_meta", :force => true do |t|
     t.string  "name"
-    t.integer "schema_version", :default => 0
-    t.boolean "enabled",        :default => true
+    t.boolean "enabled", :default => true
   end
+
+  create_table "extension_migrations", :force => true do |t|
+    t.integer "extension_id", :limit => 11
+    t.string  "version"
+  end
+
+  add_index "extension_migrations", ["extension_id"], :name => "index_extension_migrations_on_extension_id"
 
   create_table "layouts", :force => true do |t|
     t.string   "name",          :limit => 100
     t.text     "content"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "created_by_id"
-    t.integer  "updated_by_id"
+    t.integer  "created_by_id", :limit => 11
+    t.integer  "updated_by_id", :limit => 11
     t.string   "content_type",  :limit => 40
-    t.integer  "lock_version",                 :default => 0
+    t.integer  "lock_version",  :limit => 11,  :default => 0
   end
 
   create_table "page_parts", :force => true do |t|
     t.string  "name",      :limit => 100
     t.string  "filter_id", :limit => 25
     t.text    "content"
-    t.integer "page_id"
+    t.integer "page_id",   :limit => 11
   end
 
   create_table "pages", :force => true do |t|
@@ -47,16 +53,16 @@ ActiveRecord::Schema.define(:version => 21) do
     t.string   "slug",          :limit => 100
     t.string   "breadcrumb",    :limit => 160
     t.string   "class_name",    :limit => 25
-    t.integer  "status_id",                    :default => 1,     :null => false
-    t.integer  "parent_id"
-    t.integer  "layout_id"
+    t.integer  "status_id",     :limit => 11,  :default => 1,     :null => false
+    t.integer  "parent_id",     :limit => 11
+    t.integer  "layout_id",     :limit => 11
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "published_at"
-    t.integer  "created_by_id"
-    t.integer  "updated_by_id"
+    t.integer  "created_by_id", :limit => 11
+    t.integer  "updated_by_id", :limit => 11
     t.boolean  "virtual",                      :default => false, :null => false
-    t.integer  "lock_version",                 :default => 0
+    t.integer  "lock_version",  :limit => 11,  :default => 0
     t.string   "description"
     t.string   "keywords"
   end
@@ -67,8 +73,8 @@ ActiveRecord::Schema.define(:version => 21) do
     t.datetime "updated_at"
   end
 
-  add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
+  add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "snippets", :force => true do |t|
     t.string   "name",          :limit => 100, :default => "", :null => false
@@ -76,9 +82,9 @@ ActiveRecord::Schema.define(:version => 21) do
     t.text     "content"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "created_by_id"
-    t.integer  "updated_by_id"
-    t.integer  "lock_version",                 :default => 0
+    t.integer  "created_by_id", :limit => 11
+    t.integer  "updated_by_id", :limit => 11
+    t.integer  "lock_version",  :limit => 11,  :default => 0
   end
 
   add_index "snippets", ["name"], :name => "name", :unique => true
@@ -90,12 +96,12 @@ ActiveRecord::Schema.define(:version => 21) do
     t.string   "password",      :limit => 40
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "created_by_id"
-    t.integer  "updated_by_id"
+    t.integer  "created_by_id", :limit => 11
+    t.integer  "updated_by_id", :limit => 11
     t.boolean  "admin",                        :default => false, :null => false
     t.boolean  "developer",                    :default => false, :null => false
     t.text     "notes"
-    t.integer  "lock_version",                 :default => 0
+    t.integer  "lock_version",  :limit => 11,  :default => 0
     t.string   "salt"
     t.string   "session_token"
   end
