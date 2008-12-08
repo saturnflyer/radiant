@@ -130,7 +130,6 @@ describe "Standard Tags" do
     end
   end
 
-
   describe "<r:children:each:header>" do
     it "should render the header when it changes" do
       tags = '<r:children:each><r:header>[<r:date format="%b/%y" />] </r:header><r:slug /> </r:children:each>'
@@ -475,7 +474,7 @@ describe "Standard Tags" do
     end
 
     it "should filter the snippet with its assigned filter" do
-      page.should render('<r:page><r:snippet name="markdown" /></r:page>').as('<p><strong>markdown</strong></p>')
+      page.should render('<r:page><r:snippet name="markdown" /></r:page>').as(/\<p\>\<strong\>markdown\<\/strong\>\<\/p\>[\n]/)
     end
 
     it "should maintain the global page inside the snippet" do
@@ -526,6 +525,11 @@ describe "Standard Tags" do
   
   it '<r:random> should render a randomly selected, dynamically set <r:option>' do
     page(:parent).should render("<r:random:children:each:option:title />").matching(/^(Child|Child\ 2|Child\ 3)$/)
+  end
+
+  it '<r:random> should render a randomly selected, dynamically set <r:option>' do
+    pending "<r:random> should allow dynamically set <r:option>"
+    page.should render("<r:random><r:children:each><r:option><r:title /></r:option></r:children:each></r:random>").matching(/^(Child|Child\ 2|Child\ 3)$/)
   end
 
   it '<r:comment> should render nothing it contains' do
