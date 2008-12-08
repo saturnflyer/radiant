@@ -27,94 +27,181 @@ describe Page, 'validations' do
   before :each do
     @page = @model = Page.new(page_params)
   end
-
-  it 'should validate length of' do
-    {
-      :title => 255,
-      :slug => 100,
-      :breadcrumb => 160
-    }.each do |field, max|
-      assert_invalid field, ('%d-character limit' % max), 'x' * (max + 1)
-      assert_valid field, 'x' * max
-    end
+  
+  it 'should err with "255-character limit" when given a title longer than 255 characters' do
+    too_long_title = 'x' * 256
+    @page.title = too_long_title
+    @page.valid?
+    @page.errors.on(:title).should include('255-character limit')
   end
-
-  it 'should validate presence of' do
-    [:title, :slug, :breadcrumb].each do |field|
-      assert_invalid field, 'required', '', ' ', nil
-    end
+  
+  it 'should err with "100-character limit" when given a slug longer than 100 characters' do
+    too_long_slug = 'x' * 101
+    @page.slug = too_long_slug
+    @page.valid?
+    @page.errors.on(:slug).should include('100-character limit')
   end
-
-  it 'should validate format of' do
-    @page.parent = pages(:home)
-    assert_valid :slug, 'abc', 'abcd-efg', 'abcd_efg', 'abc.html', '/', '123'
-    assert_invalid :slug, 'invalid format', 'abcd efg', ' abcd', 'abcd/efg'
+  
+  it 'should err with "160-character limit" when given a breadcrumb longer than 160 characters' do
+    too_long_breadcrumb = 'x' * 161
+    @page.breadcrumb = too_long_breadcrumb
+    @page.valid?
+    @page.errors.on(:breadcrumb).should include('160-character limit')
   end
-
-  it 'should validate numericality of' do
-    assert_invalid :status_id, 'required', '', nil
-    [:id, :status_id, :parent_id].each do |field|
-      assert_valid field, '1', '2'
-      assert_invalid field, 'must be a number', 'abcd', '1,2', '1.3'
-    end
+  
+  it 'should err that title is "required" when given no title' do
+    @page.title = nil
+    @page.valid?
+    @page.errors.on(:title).should include('required')
   end
-
-  it 'should validate uniqueness of' do
+  
+  it 'should err that slug is "required" when given no slug' do
+    @page.slug = nil
+    @page.valid?
+    @page.errors.on(:slug).should include('required')
+  end
+  
+  it 'should err that breadcrumb is "required" when given no breadcrumb' do
+    @page.breadcrumb = nil
+    @page.valid?
+    @page.errors.on(:breadcrumb).should include('required')
+  end
+  
+  it 'should err that status_id is "required" when given no status_id' do
+    @page.status_id = nil
+    @page.valid?
+    @page.errors.on(:status_id).should include('required')
+  end
+  
+  it 'should err with "invalid format" with a slug containing one or more spaces' do
+    @page.slug = 'invalid slug'
+    @page.valid?
+    @page.errors.on(:slug).should include('invalid format')
+  end
+  
+  it 'should err with "invalid format" with a slug containing one or more slashes' do
+    @page.slug = 'invalid/slug'
+    @page.valid?
+    @page.errors.on(:slug).should include('invalid format')
+  end
+  
+  it 'should err that id "must be a number" when given a non integer id' do
+    @page.id = 'a'
+    @page.valid?
+    @page.errors.on(:id).should include('must be a number')
+  end
+  
+  it 'should err that status_id "must be a number" when given a non integer status_id' do
+    @page.status_id = '2,4'
+    @page.valid?
+    @page.errors.on(:status_id).should include('must be a number')
+  end
+  
+  it 'should err that parent_id "must be a number" when given a non integer parent_id' do
+    @page.parent_id = '1.3'
+    @page.valid?
+    @page.errors.on(:parent_id).should include('must be a number')
+  end
+  
+  it 'should err that "slug already in use for child of parent" when given a slug already in use by a child of the same parent page' do
     @page.parent = pages(:parent)
-    assert_invalid :slug, 'slug already in use for child of parent', 'child', 'child-2', 'child-3'
-    assert_valid :slug, 'child-4'
+    @page.slug = 'child'
+    @page.valid?
+    @page.errors.on(:slug).should include('slug already in use for child of parent')
   end
-
-  it 'should allow mass assignment for class name' do
+  
+  it 'should allow a duplicate slug when pages do not have the same parent' do
+    @page.parent = pages(:parent)
+    @page2 = @model2 = Page.new(page_params)
+    @page2.slug = 'notoriginal'
+    @page.slug = 'notoriginal'
+    @page.should be_valid
+  end
+  
+  it 'should allow assignment of class name' do
     @page.attributes = { :class_name => 'ArchivePage' }
-    assert_valid @page
-    @page.class_name.should == 'ArchivePage'
+    @page.should be_valid
   end
-
-  it 'should not be valid when class name is not a descendant of page' do
+  
+  it 'should err with "must be set to a valid descendant of Page" when the given class name is not a descendant of page' do
     @page.class_name = 'Object'
-    @page.valid?.should == false
-    assert_not_nil @page.errors.on(:class_name)
-    @page.errors.on(:class_name).should == 'must be set to a valid descendant of Page'
+    @page.valid?
+    @page.errors.on(:class_name).should include('must be set to a valid descendant of Page')
   end
 
-  it 'should not be valid when class name is not a descendant of page and it is set through mass assignment' do
+  it 'should err with "must be set to a valid descendant of Page" when the given class name is not a descendant of page and it is set through mass assignment' do
     @page.attributes = {:class_name => 'Object' }
-    @page.valid?.should == false
-    assert_not_nil @page.errors.on(:class_name)
-    @page.errors.on(:class_name).should == 'must be set to a valid descendant of Page'
+    @page.valid?
+    @page.errors.on(:class_name).should include('must be set to a valid descendant of Page')
   end
-
-  it 'should be valid when class name is page or empty or nil' do
-    [nil, '', 'Page'].each do |value|
-      @page = ArchivePage.new(page_params)
-      @page.class_name = value
-      assert_valid @page
-      @page.class_name.should == value
-    end
+    
+  it 'should save successfully with a class name of "Page"' do
+    @page = ArchivePage.new(page_params)
+    @page.class_name = 'Page'
+    lambda{@page.save!}.should_not raise_error
+  end
+  
+  it 'should have a class name of "Page" after saving with a class name of "Page"' do
+    @page = ArchivePage.new(page_params)
+    @page.class_name = 'Page'
+    @page.save
+    @page.class_name.should == 'Page'
+  end
+    
+  it 'should save successfully with a class name of ""' do
+    @page = ArchivePage.new(page_params)
+    @page.class_name = ''
+    lambda{@page.save!}.should_not raise_error
+  end
+  
+  it 'should have a class name of "" after saving with a class name of ""' do
+    @page = ArchivePage.new(page_params)
+    @page.class_name = ''
+    @page.save
+    @page.class_name.should == ''
+  end
+    
+  it 'should save successfully with a nil class name' do
+    @page = ArchivePage.new(page_params)
+    @page.class_name = nil
+    lambda{@page.save!}.should_not raise_error
+  end
+  
+  it 'should have a nil class name after saving with a nil class name' do
+    @page = ArchivePage.new(page_params)
+    @page.class_name = nil
+    @page.save
+    @page.class_name.should be_nil
   end
 end
 
 describe Page, "behaviors" do
-  it 'should include' do
+  it 'should include StandardTags' do
     Page.included_modules.should include(StandardTags)
+  end
+  it 'should include Annotatable' do
     Page.included_modules.should include(Annotatable)
   end
 end
 
 describe Page, "layout" do
   scenario :pages_with_layouts
-
-  it 'should be accessible' do
-    @page = pages(:first)
-    @page.layout_id.should == layout_id(:main)
-    @page.layout.name.should == "Main"
-  end
-
-  it 'should be inherited' do
-    @page = pages(:inherited_layout)
-    @page.layout_id.should == nil
-    @page.layout.should == @page.parent.layout
+  
+  describe "with no layout assigned" do
+    it "should return the name of the layout for its ancestor when requesting its layout name" do
+      @page = pages(:first)
+      @page.layout.name.should == "Main"
+    end
+    
+    it "should return the layout_id of the layout for its ancestor when requesting its layout_id" do
+      @page = pages(:first)
+      @page.layout_id.should == layout_id(:main)
+    end
+    
+    it "should have the layout of its ancestor" do
+      @page = pages(:inherited_layout)
+      @page.layout.should == @page.parent.layout
+    end
   end
 end
 
@@ -126,39 +213,46 @@ describe Page do
   end
 
   it 'should have parts' do
-    @page.parts.count.should == 1
-    pages(:home).parts.count.should == 4
+    @new_page = Page.new(page_params)
+    @new_page.should respond_to(:parts)
   end
-
-  it 'should destroy dependant parts' do
+  
+  it 'should destroy dependant parts when destroyed' do
     @page.parts.create(page_part_params(:name => 'test', :page_id => nil))
-    @page.parts.find_by_name('test').should be_kind_of(PagePart)
-
     id = @page.id
     @page.destroy
-    PagePart.find_by_page_id_and_name(id, 'test').should be_nil
+    PagePart.find_by_page_id(id).should be_nil
   end
-
-  it 'should allow access to parts by name with a string' do
+  
+  it 'should allow access to a part by name with a string' do
     part = @page.part('body')
     part.name.should == 'body'
   end
-
-  it 'should allow access to parts by name with a symbol' do
+  
+  it 'should allow access to a part by name with a symbol' do
     part = @page.part(:body)
     part.name.should == 'body'
   end
-
-  it 'should allow access to parts by name when page is unsaved' do
+  
+  it 'should allow access to a part by name with a string when the page is unsaved' do
     part = PagePart.new(:content => "test", :name => "test")
     @page.parts << part
     @page.part('test').should == part
+  end
+  
+  it 'should allow access to a part by name with a symbol when the page is unsaved' do
+    part = PagePart.new(:content => "test", :name => "test")
+    @page.parts << part
     @page.part(:test).should == part
   end
-
-  it 'should allow access to parts by name created with the build method when page is unsaved' do
+  
+  it 'should allow access to parts by name with a string when created with the build method and the page is unsaved' do
     @page.parts.build(:content => "test", :name => "test")
     @page.part('test').content.should == "test"
+  end
+  
+  it 'should allow access to parts by name with a symbol when created with the build method and the page is unsaved' do
+    @page.parts.build(:content => "test", :name => "test")
     @page.part(:test).content.should == "test"
   end
 
@@ -199,62 +293,74 @@ describe Page do
 
   it 'should set published_at when published' do
     @page = Page.new(page_params(:status_id => '1', :published_at => nil))
-    @page.published_at.should be_nil
-
     @page.status_id = Status[:published].id
     @page.save
-    @page.published_at.should_not be_nil
-    @page.published_at.day.should == Time.now.day
-  end
-
+    @page.published_at.strftime("%Y %m %d %H %M").should == Time.now.strftime("%Y %m %d %H %M")
+    # if you find an error here, run your specs again. Time sensitive comparisons that occor at the change of a minute may fail
+  end 
+  
   it 'should not update published_at when already published' do
     @page = Page.new(page_params(:status_id => Status[:published].id))
-    @page.published_at.should be_kind_of(Time)
-
     expected = @page.published_at
     @page.save
     @page.published_at.should == expected
   end
-
+  
+  it 'should have a Time object for published_at' do
+    @page.published_at.should be_kind_of(Time) 
+  end
+  
   it 'should answer true when published' do
     @page.status = Status[:published]
-    @page.published?.should == true
+    @page.published?.should be_true
   end
 
   it 'should answer false when not published' do
     @page.status = Status[:draft]
     @page.published?.should be_false
   end
-
-  it "should answer the page's url" do
-    @page = pages(:parent)
-    @page.url.should == '/parent/'
-    @page.children.first.url.should == '/parent/child/'
-
+  
+  it "should return a slash delimited string of slugs from the page and it's ancestors when requesting the page's url" do
     grandchild = pages(:grandchild)
     grandchild.url.should == '/parent/child/grandchild/'
   end
-
-  it 'should allow you to calculate a child url from the parent' do
+  
+  it "should allow you to calculate it's child's url" do
     @page = pages(:parent)
-    child = pages(:child)
-    @page.child_url(child).should == '/parent/child/'
+    @page.child_url(@page.children.first).should == '/parent/child/'
   end
 
   it 'should return the appropriate status code in headers' do
     @page.headers.should == { 'Status' => ActionController::Base::DEFAULT_RENDER_STATUS_CODE }
   end
-
-  it 'should have status' do
+  
+  it 'should have status_id of 1 when draft' do
     @page = pages(:home)
-    @page.status.should == Status[:published]
+    @page.status = Status[:draft]
+    @page.status_id.should == 1
+  end
+  
+  it 'should have status_id of 50 when reviewed' do
+    @page = pages(:home)
+    @page.status = Status[:reviewed]
+    @page.status_id.should == 50
+  end
+  
+  it 'should have status_id of 100 when published' do
+    @page = pages(:home)
+    @page.status_id.should == 100
+  end
+  
+  it 'should have status_id of 101 when hidden' do
+    @page = pages(:home)
+    @page.status = Status[:hidden]
+    @page.status_id.should == 101
   end
 
   it 'should allow you to set the status' do
     @page = pages(:home)
     draft = Status[:draft]
     @page.status = draft
-    @page.status.should == draft
     @page.status_id.should == draft.id
   end
 
@@ -265,33 +371,44 @@ describe Page do
   it 'should respond to virtual? with false (by default)' do
     @page.virtual?.should == false
   end
-
-  it 'should allow you to tell if a part exists based on a string or symbol' do
+  
+  it 'should state that it has a part based on a string' do
     @page = pages(:home)
-    @page.has_part?(:body).should == true
-    @page.has_part?('sidebar').should == true
-    @page.has_part?(:obviously_false_part_name).should == false
+    @page.has_part?('sidebar').should be_true
   end
-
-  it 'should allow you to tell if a part is inherited' do
-    @page = pages(:child)
-    @page.has_part?(:sidebar).should == false
-    @page.inherits_part?(:sidebar).should == true
-
+  
+  it 'should state that it has a part based on a symbol' do
     @page = pages(:home)
-    @page.has_part?(:sidebar).should == true
-    @page.inherits_part?(:sidebar).should == false
+    @page.has_part?(:body).should be_true
   end
-
-  it 'should allow you to tell if a part exists or is inherited' do
-    @page = pages(:child)
-    @page.has_part?(:sidebar).should == false
-    @page.has_or_inherits_part?(:sidebar).should == true
-    @page.has_or_inherits_part?(:obviously_false_part_name).should == false
-
+  
+  it 'should state that it does not have a part based on a string' do
     @page = pages(:home)
-    @page.has_part?(:sidebar).should == true
+    @page.has_part?('imaginary').should_not be_true
+  end
+  
+  it 'should state that it does not have a part based on a symbol' do
+    @page = pages(:home)
+    @page.has_part?(:madeup).should_not be_true
+  end
+  
+  it 'should state that it inherits an existing part from the parent when it does not have the specified part' do
+    @page = pages(:child)
+    @page.inherits_part?(:sidebar).should be_true
+  end
+  
+  it 'should state that it does not inherit a part from the parent when it has the specified part' do
+    @page = pages(:home)
+    @page.inherits_part?(:sidebar).should_not be_true
+  end
+  
+  it 'should state that it has or inherits an existing part' do
+    @page = pages(:child)
     @page.has_or_inherits_part?(:sidebar).should == true
+  end
+  
+  it 'should state that it does not have or inherit a non-existant part' do
+    @page = pages(:child)
     @page.has_or_inherits_part?(:obviously_false_part_name).should == false
   end
 
