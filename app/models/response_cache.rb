@@ -174,7 +174,8 @@ class ResponseCache
         benchmark "Cached page: #{path}" do
           FileUtils.makedirs(File.dirname(path))
           #dont want yml without data
-          File.open("#{path}.data", "wb+") { |f| f.write(content) }
+          content_result = Radiant::Config['response_cache.compressed?'] == true ? content.gsub(/[\t\r\n\f\b]/,'').gsub(/\s+/,' ') : content
+          File.open("#{path}.data", "wb+") { |f| f.write(content_result) }
           File.open("#{path}.yml", "wb+") { |f| f.write(metadata) }
         end
       end

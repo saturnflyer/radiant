@@ -115,6 +115,25 @@ describe ResponseCache do
     result.should be_kind_of(TestResponse)
   end
   
+  it "should cache content with whitespace when Radiant::Config['response_cache.compressed?'] is blank" do
+    result = @cache.cache_response('test', response('<html>
+    <table align="center">content <em>is</em>  right  here  .</table>
+    </html>', 'Content-Type' => 'text/plain'))
+    cached = @cache.update_response('test', response, ActionController::TestRequest)
+    cached.body.should == '<html>
+    <table align="center">content <em>is</em>  right  here  .</table>
+    </html>'
+  end
+  
+  it "should cache content without whitespace when Radiant::Config['response_cache.compressed?'] is set to true" do
+    Radiant::Config['response_cache.compressed?'] = true
+    result = @cache.cache_response('test', response('<html>
+    <table align="center">content <em>is</em>  right  here  .</table>
+    </html>', 'Content-Type' => 'text/plain'))
+    cached = @cache.update_response('test', response, ActionController::TestRequest)
+    cached.body.should == '<html> <table align="center">content <em>is</em> right here .</table> </html>'
+  end
+  
   it 'expire response' do
     @cache.cache_response('test', response('content'))
     @cache.expire_response('test')
