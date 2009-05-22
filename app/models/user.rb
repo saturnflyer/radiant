@@ -28,6 +28,13 @@ class User < ActiveRecord::Base
     
   attr_writer :confirm_password
   
+  def self.protected_attributes
+    @@protected_attributes ||= [:password, :password_confirmation, :email]
+  end
+  def self.protected_attributes=(array)
+    @@protected_attributes = array.map{|att| att.to_sym }
+  end
+  
   def sha1(phrase)
     Digest::SHA1.hexdigest("--#{salt}--#{phrase}--")
   end
