@@ -1,8 +1,12 @@
 == Change Log
 
+=== Edge
+
+* Catch ActiveRecord::RecordNotFound in Admin::ResourceController [Jim Gay]
+* Catch missing template errors for show routes [Jim Gay]
+
 === 0.8.0 RC1
 
-* Catch missing template errors for show routes [Jim Gay]
 * Make features task run in instance mode. [Sean Cribbs]
 * Remove Admin::AbstractModelController. [Sean Cribbs]
 * Cleanup deprecated Gem::manage_gems. [Sean Cribbs]
