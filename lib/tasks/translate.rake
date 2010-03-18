@@ -26,24 +26,25 @@ namespace :radiant do
     desc "Creates or updates the English available tag descriptions"
     task :available_tags => :environment do
       descriptions = Hash.new
+      tag_file = TranslationSupport.tag_file
       Page.tag_descriptions.sort.each do |tag, desc|
         tag = '    ' + tag.gsub(':','-') + ':'
         desc = desc.gsub('    ','      ')
         descriptions[tag] = ' "' + desc.gsub('%','&#37;').gsub('"','\"').strip + '"'
       end 
       comments = ''
-      TranslationSupport.write_file("#{RADIANT_ROOT}/config/locales/en_available_tags.yml","---\nen:\n  desc",comments,descriptions)
+      TranslationSupport.write_file(tag_file,"---\nen:\n  desc",comments,descriptions)
     end 
     
     desc "Syncs all translations available_tags to the English master"
     task :sync_available_tags => :environment do
       # All places Radiant can store locales 
       locale_paths = Radiant::AvailableLocales.locale_paths
-      # The main translation root, basically where English is kept
-      language_root = "#{RADIANT_ROOT}/config/locales"
-      words = TranslationSupport.open_available_tags("#{language_root}/en_available_tags.yml")
+      # The main tag translation root, basically where English is kept
+      tag_root = TranslationSupport.tag_root
+      words = TranslationSupport.open_available_tags("#{tag_root}/en_available_tags.yml")
       locale_paths.each do |path|
-        if path == language_root || path.match('language_pack')
+        if path == tag_root || path.match('language_pack')
           Dir["#{path}/*.yml"].each do |filename|
             next unless filename.match('_available_tags')
             basename = File.basename(filename, '_available_tags.yml')

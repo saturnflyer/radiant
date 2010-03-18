@@ -50,5 +50,13 @@ class TranslationSupport
       end
     end
     
+    def tag_root
+      "#{RADIANT_ROOT}/vendor/extensions/standard_tags/config/locales"
+    end
+    
+    def tag_file
+      "#{tag_root}/en_available_tags.yml"
+    end
+    
   end
 end

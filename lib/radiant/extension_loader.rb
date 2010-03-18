@@ -92,6 +92,14 @@ module Radiant
         end
       end.compact
     end
+    
+    def ordered_extensions
+      standard_tags_extension = extensions.delete(StandardTagsExtension)
+      if standard_tags_extension
+        extensions.unshift standard_tags_extension
+      end
+      extensions
+    end
 
     def deactivate_extensions
       extensions.each &:deactivate
@@ -103,7 +111,7 @@ module Radiant
       initializer.initialize_framework_views
       # Reset the admin UI regions
       initializer.admin.load_default_regions
-      extensions.each &:activate
+      ordered_extensions.each &:activate
       # Make sure we have our subclasses loaded!
       Page.load_subclasses
     end

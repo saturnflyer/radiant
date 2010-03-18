@@ -28,8 +28,6 @@ class Page < ActiveRecord::Base
 
   validate :valid_class_name
 
-  include Radiant::Taggable
-  include StandardTags
   include Annotatable
 
   annotate :description
