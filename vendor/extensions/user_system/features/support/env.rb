@@ -7,7 +7,6 @@ require extension_env+'.rb'
 require 'cucumber/rails/world'
 
 Dir.glob(File.join(File.dirname(__FILE__) + '..','..','..','..','..','features','**','*.rb')).each { |support| require support}
-Dir.glob(File.join(RADIANT_ROOT, "features", "**", "*.rb")).each {|step| require step}
  
 Cucumber::Rails::World.class_eval do
   include Dataset
