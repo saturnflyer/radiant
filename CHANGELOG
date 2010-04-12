@@ -2,6 +2,7 @@
 
 === Edge
 
+* Moved user related code into vendor/extensions/user_system [Jim Gay]
 * Fixed a bug with status_id PostgreSQL [Jim Gay]
 
 === Refraction 0.9.0 (June 25, 2010)
