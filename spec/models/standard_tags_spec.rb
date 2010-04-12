@@ -493,7 +493,6 @@ describe "Standard Tags" do
     end
   end
 
-<<<<<<< HEAD
   describe "<r:aggregate>" do
     it "should raise an error when given no 'urls' attribute" do
       pages(:home).should render('<r:aggregate></r:aggregate>').with_error("`urls' attribute required")
