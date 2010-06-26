@@ -13,6 +13,7 @@ class ExtensionManagerExtension < Radiant::Extension
     
     Radiant::AdminUI.class_eval { 
       attr_accessor :extensions
+      alias_method :extension, :extensions
   
       def load_default_extension_regions
         returning OpenStruct.new do |extension|

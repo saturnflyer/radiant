@@ -13,7 +13,8 @@ class UserSystemExtension < Radiant::Extension
       add_item("Users", "/admin/users", :before => 'Extensions')
     end
     Radiant::AdminUI.class_eval { 
-      attr_accessor :user
+      attr_accessor :users
+      alias_method :user, :users
   
       def self.load_default_user_regions
         returning OpenStruct.new do |user|
@@ -37,7 +38,7 @@ class UserSystemExtension < Radiant::Extension
         end
       end
     }
-    admin.user = Radiant::AdminUI.load_default_user_regions
+    admin.users = Radiant::AdminUI.load_default_user_regions
     UserActionObserver.instance.send :add_observer!, User
   end
 end
