@@ -2,6 +2,7 @@
 
 === Edge
 
+* Moved extension manager related code into vendor/extensions/extension_manager [Jim Gay] 
 * Moved user related code into vendor/extensions/user_system [Jim Gay] 
 * Integrated PageFields extension into core [Josh French]
 * Added the Sheets extension to manage Javascript and Stylesheets [Jim Gay]

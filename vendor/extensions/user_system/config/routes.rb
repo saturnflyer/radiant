@@ -1,5 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
-  # Admin Routes
+  map.namespace :admin, :member => {:remove => :get} do |admin|
+    admin.resources :users
+  end
   map.with_options(:controller => 'admin/welcome') do |welcome|
     welcome.admin          'admin',                              :action => 'index'
     welcome.welcome        'admin/welcome',                      :action => 'index'

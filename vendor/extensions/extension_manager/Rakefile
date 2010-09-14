@@ -1,22 +1,18 @@
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "radiant-user_system-extension"
-    gem.summary = %Q{User System Extension for Radiant CMS}
-    gem.description = %Q{This is the standard login system for users in Radiant.}
+    gem.name = "radiant-extension_manager-extension"
+    gem.summary = %Q{Extension Manager Extension for Radiant CMS}
+    gem.description = %Q{Describe your extension here}
     gem.email = "jim@saturnflyer.com"
-    gem.homepage = "http://github.com/radiant/radiant"
+    gem.homepage = "http://github.com/saturnflyer/radiant-extension_manager-extension"
     gem.authors = ["Jim Gay"]
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
 rescue LoadError
-  puts "Jeweler (or a dependency) not available. This is only required if you plan to package login_system as a gem."
+  puts "Jeweler (or a dependency) not available. This is only required if you plan to package extension_manager as a gem."
 end
-<<<<<<< HEAD
 
-=======
- 
->>>>>>> sfbreakout
 # In rails 1.2, plugins aren't available in the path until they're loaded.
 # Check to see if the rspec plugin is installed first and require
 # it if it is.  If not, use the gem version.
@@ -87,6 +83,7 @@ namespace :spec do
   Cucumber::Rake::Task.new(:integration) do |t|
     t.fork = true
     t.cucumber_opts = ['--format', (ENV['CUCUMBER_FORMAT'] || 'progress')]
+    # t.feature_pattern = "#{extension_root}/features/**/*.feature"
     t.profile = "default"
   end
 
@@ -118,17 +115,17 @@ namespace :spec do
   end
 end
 
-desc 'Generate documentation for the login_system extension.'
+desc 'Generate documentation for the extension_manager extension.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'LoginSystemExtension'
+  rdoc.title    = 'ExtensionManagerExtension'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
 # For extensions that are in transition
-desc 'Test the login_system extension.'
+desc 'Test the extension_manager extension.'
 Rake::TestTask.new(:test) do |t|
   t.libs << 'lib'
   t.pattern = 'test/**/*_test.rb'

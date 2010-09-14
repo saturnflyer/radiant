@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + "/../../spec_helper"
+require File.dirname(__FILE__) + "/../spec_helper.rb"
 
 describe Radiant::AdminUI do
   before :each do
@@ -24,7 +24,7 @@ describe Radiant::AdminUI do
   
   it "should load the default navigation tabs and sub-items" do
     @admin.load_default_nav
-    @admin.nav.should have(3).items
+    @admin.nav.should have(2).items
     @admin.nav[:content].should have(1).items
     @admin.nav[:design].should have(2).items
     @admin.nav[:settings].should have_at_least(1).items
@@ -91,13 +91,6 @@ describe Radiant::AdminUI do
     layout.index.bottom.should == %w{new_button}
     
     layout.new.should == layout.edit
-  end
-  
-  it "should load the default extension regions" do
-    ext = @admin.extension
-    ext.index.should_not be_nil
-    ext.index.thead.should == %w{title_header website_header version_header}
-    ext.index.tbody.should == %w{title_cell website_cell version_cell}
   end
 end
 
