@@ -2,7 +2,17 @@
 
 === Edge
 
+* Moved extension manager related code into vendor/extensions/extension_manager [Jim Gay] 
 * Moved user related code into vendor/extensions/user_system [Jim Gay] 
+* Integrated PageFields extension into core [Josh French]
+* Added the Sheets extension to manage Javascript and Stylesheets [Jim Gay]
+* Page-type select menu moved to Pages#index [Josh French]
+* Allow gem-extensions to override core views [Josh French]
+* Popup.js fix for multiple control instances [Josh French]
+
+=== Refraction 0.9.1 (June 27, 2010)
+
+* Added missing i18n translations for aggregate tages [Jim Gay]
 * Fixed a bug with status_id PostgreSQL [Jim Gay]
 
 === Refraction 0.9.0 (June 25, 2010)

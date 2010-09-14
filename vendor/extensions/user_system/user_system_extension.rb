@@ -9,7 +9,7 @@ class UserSystemExtension < Radiant::Extension
     ApplicationController.class_eval { include LoginSystem }
     Page.class_eval { include UserTags }
     tab "Settings" do
-      add_item("Personal", "/admin/preferences", :before => 'Extensions')
+      add_item("Personal", "/admin/preferences/edit", :before => 'Extensions')
       add_item("Users", "/admin/users", :before => 'Extensions')
     end
     Radiant::AdminUI.class_eval { 

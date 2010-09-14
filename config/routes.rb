@@ -12,6 +12,7 @@ ActionController::Routing::Routes.draw do |map|
   map.namespace :admin do |admin|
     admin.resource :preferences
     admin.resources :page_parts
+    admin.resources :page_fields
     admin.reference '/reference/:type.:format', :controller => 'references', :action => 'show', :conditions => {:method => :get}
   end
 
